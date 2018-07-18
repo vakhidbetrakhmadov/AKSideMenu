@@ -209,6 +209,22 @@ import UIKit
     }
 
     // MARK: - Public
+    
+    public func updateContentViewShadow() {
+        if self.contentViewShadowEnabled {
+            let layer = self.contentViewContainer.layer
+            let path = UIBezierPath(rect: layer.bounds)
+            layer.shadowPath = path.cgPath
+            layer.shadowOffset = self.contentViewShadowOffset
+            layer.shadowOpacity = self.contentViewShadowOpacity
+            layer.shadowRadius = self.contentViewShadowRadius
+            layer.cornerRadius = self.contentViewCornerRadius
+            layer.masksToBounds = true
+            if let color = self.contentViewShadowColor?.cgColor {
+                layer.shadowColor = color
+            }
+        }
+    }
 
     public func presentLeftMenuViewController() {
         guard let leftMenuViewController = self.leftMenuViewController else { return }
@@ -395,6 +411,9 @@ import UIKit
             self.contentButton.removeFromSuperview()
 
             let animationBlock = { [unowned self] in
+                // self.updateContentViewShadow() is needed here so that contentView nicely updates,
+                // when it's IBDesignable properties are changed in willHideMenuViewController
+                self.updateContentViewShadow()
                 self.contentViewContainer.transform = .identity
                 self.contentViewContainer.frame = self.view.bounds
                 self.updateContentViewAdditionalSafeAreaInsets()
@@ -459,23 +478,7 @@ import UIKit
             })
         }
     }
-
-    func updateContentViewShadow() {
-        if self.contentViewShadowEnabled {
-            let layer = self.contentViewContainer.layer
-            let path = UIBezierPath(rect: layer.bounds)
-            layer.shadowPath = path.cgPath
-            layer.shadowOffset = self.contentViewShadowOffset
-            layer.shadowOpacity = self.contentViewShadowOpacity
-            layer.shadowRadius = self.contentViewShadowRadius
-            layer.cornerRadius = self.contentViewCornerRadius
-            layer.masksToBounds = true
-            if let color = self.contentViewShadowColor?.cgColor {
-                layer.shadowColor = color
-            }
-        }
-    }
-
+    
     func resetContentViewScale() {
         let transform = self.contentViewContainer.transform
         let scale: CGFloat = sqrt(transform.a * transform.a + transform.c * transform.c)
